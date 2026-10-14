@@ -20,7 +20,7 @@ A clean `setup.mjs` run in a new `WHITEBOARD_HOME` fetched pinned commit `8084a1
 
 `npm run verify:sessions` runs these checks. `WHITEBOARD_TEST_RUNTIME` selected the fresh installed runtime for this verification. Temporary test servers were stopped afterward.
 
-The ten layout-checker tests passed, covering duplicate connector labels, overlap, clearance, unsupported paths, invalid scenes, and read-only behavior. Both public example exports passed the checker and were visually inspected. The architecture board was also inspected in the live browser.
+The ten layout-checker tests passed, covering duplicate connector labels, overlap, clearance, unsupported paths, invalid scenes, and read-only behavior. The public example exports passed the checker and were visually inspected. The architecture and collaborative-iteration boards were also inspected in the live browser.
 
 The skill metadata validator passed. The global Codex and Claude Code installations matched `skills/whiteboard/` byte-for-byte. Discovery in a new chat in either app has not been independently tested.
 

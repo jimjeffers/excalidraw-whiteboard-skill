@@ -1,6 +1,6 @@
 # Excalidraw Whiteboard Skill
 
-Draw, discuss, and refine the same local Excalidraw board with Codex or Claude Code. The agent can create diagrams, read your changes, and update individual elements while you work in the browser.
+Draw, discuss, and refine the same local Excalidraw board with Codex or Claude Code. The agent uses diagrams to explain a design; you use edits and sketches to communicate constraints, questions, and alternative approaches back to the agent.
 
 ## Install and bootstrap
 
@@ -38,15 +38,41 @@ The skill defaults to a succinct, high-level view. It keeps supporting explanati
 
 ## Work together
 
+The whiteboard is a shared conversation surface. A question beside a component, a new connection, or a rearranged group can express a concern that is hard to describe in chat alone.
+
 1. Ask the agent to sketch a system, function, or process.
 2. Edit the same board in your browser: move a component, rename it, or draw a new connection.
 3. Wait for sync, or click **Sync to Backend**, then tell the agent to read the board.
 4. Discuss the changes. The agent reads scene data and a fresh image, saves a snapshot before substantial edits, and updates the relevant elements.
 5. Export an editable `.excalidraw` file and PNG when an iteration is ready.
 
-For example: “I added a retry queue. Read the board and help me explain the failure path.”
-
 Drawing does not automatically wake the agent. Comparing versions is an explicit agent step using a saved export or snapshot; there is no automatic change feed or per-author history. Take turns editing: simultaneous browser and agent writes can overwrite each other.
+
+### Example: use your drawing to explain a missing case
+
+In this illustrated scenario, you're designing an upload-processing flow. The whiteboard shows three stages of the same design conversation. All stages were drawn for this example with the skill.
+
+![Three stages: the agent sketches Upload → Worker → Results; the human adds a red “Invalid file?” question pointing at Worker; together they add a validation decision and a separate error path.](examples/collaborative-iteration.png)
+
+[Download the editable conversation example](examples/collaborative-iteration.excalidraw).
+
+**Start with the agent's sketch.** Ask: “Draw the high-level path from uploading a file to getting processed results.” The agent draws the first stage and saves an export as a baseline for later comparison.
+
+**Use the canvas to explain your concern.** In your browser, add “Invalid file?” in red and point an arrow at the worker. The original success path stays intact, while your annotation identifies the missing case and where it matters.
+
+After the edit syncs, continue in chat:
+
+> Read the board. I added a question beside the worker. What should happen when someone uploads an invalid file?
+
+**Discuss what changed.** The agent reads the current elements and a fresh image, then compares them with the saved first pass. An example response:
+
+> You added an “Invalid file?” question pointing at the worker. The upload-to-results path is unchanged. We could validate the file before processing and show an error if validation fails. What makes a file invalid for this project?
+
+Your reply connects the sketch to a concrete requirement:
+
+> For this example, reject unsupported formats. Add that check and the error path, and keep the rest high-level.
+
+**Refine the shared design.** The agent saves a snapshot and adds the decision and error branch shown in stage three, keeping your concern visible until you agree it is resolved. You can then revise the diagram again or use it to guide implementation.
 
 ## Architecture: one server per board session
 
