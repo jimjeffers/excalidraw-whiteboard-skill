@@ -1,0 +1,14 @@
+{
+  "name": "jimjeffers-skills",
+  "description": "Jim Jeffers' skills for collaborative software design.",
+  "owner": {
+    "name": "Jim Jeffers"
+  },
+  "plugins": [
+    {
+      "name": "excalidraw-whiteboard",
+      "source": "./",
+      "description": "Shared local Excalidraw sessions for visual design discussions with your coding agent."
+    }
+  ]
+}

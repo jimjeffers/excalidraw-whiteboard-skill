@@ -1,0 +1,13 @@
+{
+  "name": "excalidraw-whiteboard",
+  "version": "0.1.0",
+  "description": "Draw, discuss, and refine local Excalidraw whiteboards with your coding agent.",
+  "author": {
+    "name": "Jim Jeffers",
+    "url": "https://github.com/jimjeffers"
+  },
+  "homepage": "https://github.com/jimjeffers/excalidraw-whiteboard-skill",
+  "repository": "https://github.com/jimjeffers/excalidraw-whiteboard-skill",
+  "license": "MIT",
+  "keywords": ["excalidraw", "whiteboard", "diagrams", "architecture", "collaboration"]
+}

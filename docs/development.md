@@ -29,6 +29,19 @@ npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill --list
 
 There is no separate npm package or skills.sh registry submission to publish. According to [Vercel's publishing guide](https://vercel.com/kb/guide/agent-skills-creating-installing-and-sharing-reusable-agent-context#5-publishing-and-discoverability-how-listing-actually-works), skills can appear on skills.sh through install telemetry. Direct installation works independently of directory indexing; do not promise immediate search visibility. The [CLI documentation](https://skills.sh/docs/cli) explains telemetry and its opt-out setting.
 
+The repository is also a Claude Code plugin marketplace. `.claude-plugin/marketplace.json` lists the root plugin, whose manifest is `.claude-plugin/plugin.json`; its standard `skills/` directory contains the same skill installed by the Skills CLI. No second implementation is maintained. Validate both manifests with `claude plugin validate PATH --strict`, and test installation with an isolated `CLAUDE_CONFIG_DIR` before publishing changes. Keep the plugin version and `metadata.version` in the skill aligned when releasing an update.
+
+For ClawHub, publish only `skills/whiteboard/`, including its license. Use the pinned CLI and review the preview first:
+
+```sh
+npx --yes clawhub@0.23.3 login
+npx --yes clawhub@0.23.3 skill publish skills/whiteboard \
+  --slug excalidraw-whiteboard --name "Excalidraw Whiteboard" \
+  --version 0.1.0 --changelog "Initial release" --dry-run
+```
+
+After reviewing, remove `--dry-run` and include `--source-repo jimjeffers/excalidraw-whiteboard-skill --source-commit COMMIT_SHA --source-path skills/whiteboard` for the exact published source. Choose a new version for changed content. ClawHub requires an authenticated publisher and may hold a release for security checks; a preview or accepted upload is not proof that a public listing is available. Its runtime metadata declares local tools and optional storage overrides; no API key is required by the whiteboard itself.
+
 ## Layout checks
 
 ```sh

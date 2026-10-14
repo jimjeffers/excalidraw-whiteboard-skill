@@ -1,6 +1,22 @@
 ---
 name: whiteboard
 description: "Start, reopen, read, and edit local Excalidraw whiteboards with the user during project design discussions. Use for shared canvas sessions and iterative system diagrams."
+license: MIT
+metadata:
+  author: Jim Jeffers
+  version: "0.1.0"
+  compatibility: "Requires a local shell, Node.js 20+, npm, Git, and a browser on the same computer. Setup downloads and builds a pinned runtime; sessions write local state and launch loopback servers."
+  openclaw:
+    homepage: https://github.com/jimjeffers/excalidraw-whiteboard-skill
+    requires:
+      bins: [node, npm, git]
+    envVars:
+      - name: WHITEBOARD_HOME
+        required: false
+        description: Override the local runtime and session storage directory.
+      - name: WHITEBOARD_RUNTIME
+        required: false
+        description: Use an existing local runtime build instead of the installed runtime manifest.
 ---
 
 # Whiteboard

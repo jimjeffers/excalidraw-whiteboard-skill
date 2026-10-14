@@ -31,6 +31,17 @@ In a chat with the installed skill available, ask:
 
 The agent starts a named board and opens its returned URL, or supplies a link if it cannot open a browser. You can also invoke `$whiteboard` in Codex.
 
+### Alternative: Claude Code plugin marketplace
+
+For Claude Code, you can install the same skill as a plugin:
+
+```sh
+claude plugin marketplace add jimjeffers/excalidraw-whiteboard-skill
+claude plugin install excalidraw-whiteboard@jimjeffers-skills
+```
+
+Start a new Claude Code session and invoke `/excalidraw-whiteboard:whiteboard`, or ask Claude to use the whiteboard skill. The first board request bootstraps the same local runtime described above. Choose this or the Skills CLI for Claude Code to avoid duplicate copies; Codex can continue using the Skills CLI.
+
 ## What you can draw
 
 This background-job diagram was created through the skill's session CLI and rendered by the local Excalidraw runtime. Its shapes, arrows, and labels remain editable.
