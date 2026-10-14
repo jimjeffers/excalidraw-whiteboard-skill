@@ -2,6 +2,33 @@
 
 The reusable skill lives in `skills/whiteboard/`. Edit that copy, then install it into the desired agent profile. The scripts use Node built-ins; the repository itself needs no `npm install`.
 
+## Install from a checkout
+
+Use this method to develop the skill or install without the Skills CLI. It requires Node 20+, npm, and Git.
+
+```sh
+git clone https://github.com/jimjeffers/excalidraw-whiteboard-skill.git
+cd excalidraw-whiteboard-skill
+
+# Install for either agent, or run both commands.
+npm run install:skill          # Codex: ~/.codex/skills/whiteboard
+npm run install:skill:claude   # Claude Code: ~/.claude/skills/whiteboard
+
+npm run setup
+```
+
+These copies have different ownership and update behavior from a Skills CLI installation. Use the repository installers for local development copies and the Skills CLI for copies managed by that CLI. Avoid installing the same skill through both methods for the same agent.
+
+## Distribution and discovery
+
+The public repository is directly installable with the Skills CLI. Its `skills/whiteboard/SKILL.md` supplies the name and description; supporting scripts and references travel with the skill folder.
+
+```sh
+npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill --list
+```
+
+There is no separate npm package or skills.sh registry submission to publish. According to [Vercel's publishing guide](https://vercel.com/kb/guide/agent-skills-creating-installing-and-sharing-reusable-agent-context#5-publishing-and-discoverability-how-listing-actually-works), skills can appear on skills.sh through install telemetry. Direct installation works independently of directory indexing; do not promise immediate search visibility. The [CLI documentation](https://skills.sh/docs/cli) explains telemetry and its opt-out setting.
+
 ## Layout checks
 
 ```sh

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 // This checks stored geometry; it neither renders text nor changes the scene.
 const SHAFT_CLEARANCE = 24;
@@ -94,7 +93,10 @@ export function checkLayout(scene) {
   return { checkedConnectors, issues, manualReview: [...manual.values()] };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+// Skills installers can expose this file through an agent-directory symlink.
+const isMain = process.argv[1] && existsSync(process.argv[1])
+  && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+if (isMain) {
   try {
     if (process.argv.length !== 3) throw new Error('Usage: node check-layout.mjs /absolute/path/board.excalidraw');
     const report = checkLayout(JSON.parse(readFileSync(process.argv[2], 'utf8')));

@@ -4,19 +4,24 @@ Draw, discuss, and refine the same local Excalidraw board with Codex or Claude C
 
 ## Install and bootstrap
 
-Requires **Node.js 20+**, npm, Git, and a local browser. Tested on macOS with Node 24 and Chrome. Setup downloads and builds the pinned open-source runtime; allow a few minutes for the first install.
+Use the Skills CLI to install directly from GitHub, without manually cloning this repository. Requires **Node.js 22.20+** for the pinned installer below, npm, Git, and a local browser. Node 24 is recommended and is the tested version on macOS.
 
 ```sh
-git clone https://github.com/jimjeffers/excalidraw-whiteboard-skill.git
-cd excalidraw-whiteboard-skill
-
-# Install for either agent, or run both commands.
-npm run install:skill          # Codex: ~/.codex/skills/whiteboard
-npm run install:skill:claude   # Claude Code: ~/.claude/skills/whiteboard
-
-# Build and install the shared local runtime once.
-npm run setup
+npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill \
+  --skill whiteboard --global --agent codex claude-code
 ```
+
+Remove either agent name to install for just one. `--global` makes the skill available across projects; omit it for a project-local installation. The installer version is pinned to the version verified with this repository.
+
+The CLI installs the skill and its bundled scripts. On your first whiteboard request, the skill instructs the agent to run `setup.mjs` if the runtime is missing, then launch a board. Setup downloads and builds the pinned open-source runtime once; allow a few minutes. It does not require a checkout of this repository.
+
+For the default global installation above, you can also bootstrap ahead of time:
+
+```sh
+node "$HOME/.agents/skills/whiteboard/scripts/setup.mjs"
+```
+
+The Skills CLI stores a shared copy under `~/.agents/skills/whiteboard/` and links Claude Code to it. If you want to edit the skill itself, use the [checkout installation](docs/development.md#install-from-a-checkout), which supports Node 20+. Choose one installation method so you have one managed copy per agent.
 
 No Excalidraw account, API key, Docker, or MCP server is needed. The editor, service, and fonts run locally after setup. Your agent's normal access requirements still apply. This is a local desktop workflow; a cloud-only agent cannot access your computer's loopback address.
 
@@ -138,7 +143,9 @@ skills/whiteboard/
     └── dependency-lock.patch   # Recorded dependency changes
 ```
 
-Edit `skills/whiteboard/`, then rerun the appropriate `install:skill` command. Each installation replaces the whole skill folder and backs up the old copy under that agent profile's `skill-backups/` directory. The Codex installer respects `CODEX_HOME`; the Claude installer uses `~/.claude`. Board data is kept separately.
+For a Skills CLI installation, rerun the install command above to update this skill from GitHub. The CLI fetches the current repository version; pinning the installer does not pin the skill to a commit.
+
+For a checkout installation, edit `skills/whiteboard/`, then rerun the appropriate `install:skill` command. That repository installer replaces the whole skill folder and backs up the old copy under the agent profile's `skill-backups/` directory. It respects `CODEX_HOME` for Codex and uses `~/.claude` for Claude Code. Board data is kept separately.
 
 Run installers and board operations sequentially. Rerun setup when a runtime update requires it; setup reuses an already installed version. For checks and the original prototype, see [development](docs/development.md).
 

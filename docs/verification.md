@@ -20,9 +20,11 @@ A clean `setup.mjs` run in a new `WHITEBOARD_HOME` fetched pinned commit `8084a1
 
 `npm run verify:sessions` runs these checks. `WHITEBOARD_TEST_RUNTIME` selected the fresh installed runtime for this verification. Temporary test servers were stopped afterward.
 
-The ten layout-checker tests passed, covering duplicate connector labels, overlap, clearance, unsupported paths, invalid scenes, and read-only behavior. The public example exports passed the checker and were visually inspected. The architecture and collaborative-iteration boards were also inspected in the live browser.
+The eleven layout-checker tests passed, covering duplicate connector labels, overlap, clearance, unsupported paths, invalid scenes, read-only behavior, and invocation through an installed skill directory symlink. The public example exports passed the checker and were visually inspected. The architecture and collaborative-iteration boards were also inspected in the live browser.
 
 The skill metadata validator passed. The global Codex and Claude Code installations matched `skills/whiteboard/` byte-for-byte. Discovery in a new chat in either app has not been independently tested.
+
+`skills@1.7.2 add ... --list` discovered `whiteboard` from the public GitHub repository. A disposable project installation for Codex and Claude Code copied all ten skill files unchanged and linked Claude Code to the canonical `.agents/skills/whiteboard/` directory. The installed helper listed an isolated empty registry, and the installed layout checker passed against the conversation example. Test-install telemetry was disabled; these checks do not confirm skills.sh directory indexing. The tested CLI requires Node 22.20+, while the skill scripts themselves require Node 20+.
 
 ## Original prototype
 

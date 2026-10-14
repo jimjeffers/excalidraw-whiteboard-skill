@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { checkLayout } from '../skills/whiteboard/scripts/check-layout.mjs';
@@ -90,4 +90,21 @@ test('CLI reports issues, preserves the input file, and distinguishes invalid in
   assert.equal(spawnSync(process.execPath, [executable, file]).status, 0);
   writeFileSync(file, 'not json');
   assert.equal(spawnSync(process.execPath, [executable, file]).status, 2);
+});
+
+test('CLI runs through a skill directory symlink created by an installer', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'whiteboard-layout-link-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const linkedScripts = join(dir, 'linked-scripts');
+  symlinkSync(dirname(executable), linkedScripts, 'dir');
+  const file = join(dir, 'board.excalidraw');
+  const linkedExecutable = join(linkedScripts, 'check-layout.mjs');
+  writeFileSync(file, JSON.stringify(scene(110)));
+  const crowded = spawnSync(process.execPath, [linkedExecutable, file], { encoding: 'utf8' });
+  assert.equal(crowded.status, 1, 'A linked checker must report layout failures instead of silently succeeding');
+  assert(JSON.parse(crowded.stdout).issues.some(issue => issue.code === 'connector-space'));
+  writeFileSync(file, JSON.stringify(scene()));
+  const clean = spawnSync(process.execPath, [linkedExecutable, file], { encoding: 'utf8' });
+  assert.equal(clean.status, 0);
+  assert.deepEqual(JSON.parse(clean.stdout).issues, []);
 });
