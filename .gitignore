@@ -1,0 +1,9 @@
+upstream/
+.local/
+.codex/config.toml
+node_modules/
+output/
+boards/
+.env
+.env.*
+.DS_Store

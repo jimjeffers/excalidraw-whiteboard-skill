@@ -1,0 +1,24 @@
+{
+  "name": "excalidraw-whiteboard-skill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Excalidraw whiteboard sessions for Codex and Claude Code",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "setup": "node skills/whiteboard/scripts/setup.mjs",
+    "session": "node skills/whiteboard/scripts/session.mjs",
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "install:skill": "node scripts/install-skill.mjs",
+    "install:skill:claude": "node scripts/install-skill.mjs --claude",
+    "start": "node scripts/whiteboard.mjs start",
+    "stop": "node scripts/whiteboard.mjs stop",
+    "status": "node scripts/whiteboard.mjs status",
+    "board": "node scripts/whiteboard.mjs",
+    "seed": "node scripts/seed.mjs",
+    "verify": "node scripts/verify.mjs",
+    "verify:sessions": "node scripts/verify-sessions.mjs",
+    "verify:layout": "node --test scripts/verify-layout.test.mjs"
+  }
+}
