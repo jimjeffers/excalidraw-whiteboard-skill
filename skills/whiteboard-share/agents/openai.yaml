@@ -1,4 +1,4 @@
 interface:
   display_name: "Whiteboard Share"
-  short_description: "Publish an Excalidraw snapshot when requested"
-  default_prompt: "Use $whiteboard-share to upload this whiteboard to Excalidraw.com and return a snapshot link."
+  short_description: "Share a snapshot or import into Excalidraw Plus"
+  default_prompt: "Use $whiteboard-share to upload this whiteboard to the Excalidraw destination I specify."

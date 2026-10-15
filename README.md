@@ -42,9 +42,9 @@ claude plugin install excalidraw-whiteboard@jimjeffers-skills
 
 Start a new Claude Code session and invoke `/excalidraw-whiteboard:whiteboard`, or ask Claude to use the whiteboard skill. The first board request bootstraps the same local runtime described above. Choose this or the Skills CLI for Claude Code to avoid duplicate copies; Codex can continue using the Skills CLI.
 
-## Optional: share a snapshot online
+## Optional: upload online
 
-The companion [whiteboard-share skill](skills/whiteboard-share/SKILL.md) uploads a saved revision to Excalidraw.com only when you request it. Local drawing and file exports remain local. Install it directly from GitHub:
+The companion [whiteboard-share skill](skills/whiteboard-share/SKILL.md) can create an Excalidraw.com snapshot link or import a drawing into your Excalidraw Plus account, only when requested. Local drawing and file exports remain local. Install it directly from GitHub:
 
 ```sh
 npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill \
@@ -53,13 +53,29 @@ npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill \
 
 The Claude Code plugin already includes this companion; invoke `/excalidraw-whiteboard:whiteboard-share`. For an existing plugin installation, refresh the marketplace with `claude plugin marketplace update jimjeffers-skills`, then run `claude plugin update excalidraw-whiteboard@jimjeffers-skills` and start a new session. From a development checkout, use `npm run install:share` for Codex or `npm run install:share:claude` for Claude Code.
 
-Then ask:
+### Excalidraw.com snapshot link
+
+Ask:
 
 > Use whiteboard-share to upload this board to Excalidraw.com and give me a snapshot link.
 
 The agent exports the selected board, inspects that revision, and uses `share.mjs` to encrypt and upload it. The helper saves the link in a local receipt and verifies that the service returns the same encrypted payload. No Excalidraw account or MCP server is required. Anyone with the complete link can open the drawing.
 
 The link represents that revision: changes to the local board or a viewer's copy do not update the shared snapshot. Publish another revision for a new link. The helper handles diagrams without images, up to 5 MiB of JSON; boards with images use Excalidraw.com's browser import and sharing workflow. The local service stays on loopback throughout. See the [sharing commands and checks](docs/development.md#sharing-checks) for direct CLI use.
+
+### Excalidraw Plus account
+
+Plus imports use the [official Excalidraw CLI](https://github.com/excalidraw/cli), pinned to `0.2.0`, and require **Node.js 22+** and a Plus API key. Generate the key in [Plus settings](https://plus.excalidraw.com/docs/api/authentication), then run this in your terminal and enter it at the prompt:
+
+```sh
+npx --yes @excalidraw/cli@0.2.0 login --api-url https://api.excalidraw.com
+```
+
+The CLI saves the key locally. Do not paste it into agent chat. Use a personal key to import into your private collection; a workspace key requires a shared collection. The agent checks the authenticated workspace before importing. Then ask:
+
+> Use whiteboard-share to import this board into my private Excalidraw Plus collection as "API design".
+
+Or name an existing shared collection. The agent imports a new editable scene, including embedded images, and reads it back to verify the content. It preserves the returned scene ID if a content upload fails, so recovery can target that scene instead of creating duplicates. Access follows the selected collection and workspace settings; this does not enable public sharing or keep local and Plus edits synchronized. See the [Plus workflow](skills/whiteboard-share/references/plus.md) for verification and recovery.
 
 ## What you can draw
 
@@ -184,10 +200,11 @@ skills/whiteboard-share/
 ├── SKILL.md                    # Explicit sharing workflow
 ├── LICENSE
 ├── agents/openai.yaml          # Codex display metadata
-└── scripts/share.mjs           # Inspect, encrypt, upload, verify
+├── references/plus.md          # Official CLI account import workflow
+└── scripts/share.mjs           # Account-free snapshot upload
 ```
 
-It accepts native exports and needs no runtime bootstrap. Update a Skills CLI installation by rerunning its install command. For a checkout installation, edit this folder and rerun `install:share` or `install:share:claude`. The local session helper has no upload command.
+It accepts native exports and needs no local server bootstrap. Plus imports download the pinned official CLI on first use and require account authentication. Update a Skills CLI installation by rerunning its install command. For a checkout installation, edit this folder and rerun `install:share` or `install:share:claude`. The local session helper has no upload command.
 
 Run installers and board operations sequentially. Rerun setup when a runtime update requires it; setup reuses an already installed version. For checks and the original prototype, see [development](docs/development.md).
 

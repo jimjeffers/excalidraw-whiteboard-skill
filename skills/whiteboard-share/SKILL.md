@@ -1,16 +1,25 @@
 ---
 name: whiteboard-share
-description: "Upload a local Excalidraw whiteboard as an Excalidraw.com snapshot link when the user asks to publish or share it online. Use for explicit cloud sharing, not ordinary local drawing or file exports."
+description: "Upload a local Excalidraw whiteboard as an Excalidraw.com snapshot link or import it into an Excalidraw Plus account. Use for explicit online sharing or account uploads, not ordinary local drawing or file exports."
 license: MIT
 metadata:
   author: Jim Jeffers
-  version: "0.2.0"
-  compatibility: "Requires Node.js 20+ and network access to Excalidraw.com. Accepts a local .excalidraw export; no account, API key, MCP, or local server is required for upload."
+  version: "0.3.0"
+  compatibility: "Snapshot links require Node.js 20+ and network access, without an account. Plus imports use the pinned official CLI with Node.js 22+ and a Plus API key. Both accept a local .excalidraw export; no MCP server is required."
 ---
 
 # Whiteboard Share
 
-Publish one saved revision to Excalidraw.com and return its shareable link. Use this companion when the user requests online sharing. Creating a diagram, exporting a file, installing this skill, or mentioning collaboration does not authorize an upload. If the user already requested upload of an identified board, proceed without asking for the same permission again. If “share” could mean a local session or file, clarify the destination first.
+Upload one saved revision to the destination the user requests. Creating a diagram, exporting a file, installing this skill, or mentioning collaboration does not authorize an upload. If the user already requested upload of an identified board, proceed without asking for the same permission again. If “share” could mean a local session, snapshot link, or account import, clarify the destination first.
+
+## Choose the destination
+
+- **Excalidraw.com snapshot link:** follow the steps below. No account is required.
+- **Excalidraw Plus account:** follow [Plus imports](references/plus.md). This creates an editable scene in the selected account collection through the official CLI, including embedded image assets. It requires authentication and is not a public snapshot link.
+
+Do not fall back from a failed Plus import to a public snapshot upload. Neither destination establishes ongoing synchronization with the local board.
+
+## Excalidraw.com snapshots
 
 The result is an immutable snapshot, with no ongoing connection to the local board. Later changes require a new upload. No Excalidraw account is needed. Anyone with the complete link can open the drawing; its fragment contains the decryption key. Keep links and receipts out of Git and public logs unless the user asks to publish them. This helper does not offer revocation or promise a retention period.
 
@@ -26,7 +35,7 @@ node "$SHARE_CLI" inspect /absolute/path/board.excalidraw
 
 Inspection is offline. It returns the source file's SHA-256 and the number of live elements. Deleted elements, editor selection state, and unreferenced files are excluded; labels, connections, IDs, layout, and background are preserved. Keep content review proportional to the request; if the scene contains unexpected material outside the requested board, resolve that before publishing.
 
-The first version supports diagrams without image elements, up to 5 MiB of input JSON. It refuses image boards because Excalidraw stores shared images separately. For those boards, import the file into Excalidraw.com in a separate browser tab and use its Share / Export link workflow within the user's existing upload authorization. Preserve any preexisting browser drawing. Do not strip images to make the upload succeed. Excalidraw Plus and custom services are outside this helper's scope.
+The snapshot helper supports diagrams without image elements, up to 5 MiB of input JSON. It refuses image boards because Excalidraw stores shared images separately. For those boards, import the file into Excalidraw.com in a separate browser tab and use its Share / Export link workflow within the user's existing upload authorization. Preserve any preexisting browser drawing. Do not strip images to make the upload succeed. This helper does not target Plus or custom services; Plus uses its separate workflow above.
 
 ## Upload and verify
 

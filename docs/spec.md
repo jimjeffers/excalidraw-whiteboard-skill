@@ -47,9 +47,11 @@ The [official Excalidraw development guide](https://github.com/excalidraw/excali
 
 `npm run verify` exercises these on a disposable canvas. See `verification.md` for the latest observed result.
 
-## Optional snapshot sharing
+## Optional online uploads
 
 `whiteboard-share` is a separate companion skill for an explicit request to publish a saved revision to Excalidraw.com. It accepts a native export, inspects it offline, encrypts before upload, and returns a snapshot link with a local receipt. It does not alter the local session or connect the board to a cloud collaboration room. The first version handles diagrams without image assets; it directs image boards to the browser sharing workflow. Ordinary whiteboard work remains local.
+
+For account storage, the same companion routes explicit Excalidraw Plus requests to the pinned official CLI. A Plus API key identifies the workspace; personal keys can import into the owner's private collection, while workspace keys require a shared collection. The workflow creates a new editable scene from a native export, including embedded images, then reads back and verifies it. Partial creation is recovered using the returned scene ID. It does not enable public sharing, replace existing scenes implicitly, or synchronize later local and cloud edits.
 
 ## Limits and next decisions
 

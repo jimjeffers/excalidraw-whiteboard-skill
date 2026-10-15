@@ -75,6 +75,18 @@ The automated tests are offline. They independently decrypt the generated wire p
 
 The helper follows the [official Excalidraw export implementation](https://github.com/excalidraw/excalidraw/blob/master/excalidraw-app/data/index.ts) and its [binary encoding](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/encode.ts). The public service can change independently of this repository. Images require a separate asset storage workflow and are rejected by the helper rather than omitted.
 
+## Plus import checks
+
+Plus support is a workflow in `skills/whiteboard-share/references/plus.md` using the official `@excalidraw/cli@0.2.0`; no second API client or credential store is maintained here. It requires Node 22+, separate from the snapshot helper's Node 20+ requirement. Account login, collection selection, import, verification, and recovery commands are documented in that reference.
+
+```sh
+npm run verify:plus
+```
+
+This opt-in check downloads the pinned CLI if needed, then runs it against a disposable loopback API with a fake key. It checks account discovery, native import including image data, content read-back, rejection before creation, and preservation of the created scene ID when content upload fails. It makes no requests to a real Plus workspace and does not read or replace your saved login. These checks verify the CLI workflow, not the live Plus service.
+
+For a live check, authenticate through the CLI, choose the intended workspace and collection, and import an already public example as a new scene. Read it back and inspect it in the Plus UI. Keep attempt records and downloaded scenes under ignored `.local/` paths. Do not claim live verification when credentials are unavailable. The API remains in public beta; recheck the commands and these tests before changing the pinned CLI version.
+
 ## Integration checks
 
 Install Google Chrome, then prepare the development runtime and its Playwright dependency:
