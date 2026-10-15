@@ -4,7 +4,7 @@ description: "Start, reopen, read, and edit local Excalidraw whiteboards with th
 license: MIT
 metadata:
   author: Jim Jeffers
-  version: "0.1.0"
+  version: "0.2.0"
   compatibility: "Requires a local shell, Node.js 20+, npm, Git, and a browser on the same computer. Setup downloads and builds a pinned runtime; sessions write local state and launch loopback servers."
   openclaw:
     homepage: https://github.com/jimjeffers/excalidraw-whiteboard-skill
@@ -71,3 +71,5 @@ Export the current scene before replacing it with an imported board. A named sna
 Leave the server running when the user will continue drawing or discussing. Use `stop SESSION_ID` when asked to end that whiteboard session; it preserves the board and snapshots. List/open let a later chat resume it. Do not stop every server, delete saved boards, or attach another agent to a board implicitly.
 
 The helper serializes its own commands and verifies session identity. This does not coordinate simultaneous human drawing. It binds to loopback and does not expose a network service or upload boards. Keep cloud sharing outside this local workflow unless separately requested.
+
+When the user explicitly asks for an Excalidraw.com snapshot link, use the optional `whiteboard-share` companion skill with a fresh native export. Ordinary board creation and exports remain local; online sharing is a separate action.

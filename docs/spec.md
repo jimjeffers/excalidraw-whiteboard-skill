@@ -47,6 +47,10 @@ The [official Excalidraw development guide](https://github.com/excalidraw/excali
 
 `npm run verify` exercises these on a disposable canvas. See `verification.md` for the latest observed result.
 
+## Optional snapshot sharing
+
+`whiteboard-share` is a separate companion skill for an explicit request to publish a saved revision to Excalidraw.com. It accepts a native export, inspects it offline, encrypts before upload, and returns a snapshot link with a local receipt. It does not alter the local session or connect the board to a cloud collaboration room. The first version handles diagrams without image assets; it directs image boards to the browser sharing workflow. Ordinary whiteboard work remains local.
+
 ## Limits and next decisions
 
 The upstream browser can send a full scene replacement. Concurrent edits can overwrite one another; this prototype relies on turn-taking. Browser undo is not a substitute for a saved snapshot of agent changes. There is no automatic association between a Codex chat and a board.

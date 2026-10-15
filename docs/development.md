@@ -1,6 +1,6 @@
 # Development
 
-The reusable skill lives in `skills/whiteboard/`. Edit that copy, then install it into the desired agent profile. The scripts use Node built-ins; the repository itself needs no `npm install`.
+The local workflow lives in `skills/whiteboard/`; explicit online sharing lives in `skills/whiteboard-share/`. Edit these source folders, then install them into the desired agent profiles. The scripts use Node built-ins; the repository itself needs no `npm install`.
 
 ## Install from a checkout
 
@@ -21,7 +21,7 @@ These copies have different ownership and update behavior from a Skills CLI inst
 
 ## Distribution and discovery
 
-The public repository is directly installable with the Skills CLI. Its `skills/whiteboard/SKILL.md` supplies the name and description; supporting scripts and references travel with the skill folder.
+The public repository is directly installable with the Skills CLI. Each `skills/*/SKILL.md` supplies a skill's name and description; supporting scripts and references travel with that skill folder. Listing the repository should discover both `whiteboard` and `whiteboard-share`:
 
 ```sh
 npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill --list
@@ -29,7 +29,7 @@ npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill --list
 
 There is no separate npm package or skills.sh registry submission to publish. According to [Vercel's publishing guide](https://vercel.com/kb/guide/agent-skills-creating-installing-and-sharing-reusable-agent-context#5-publishing-and-discoverability-how-listing-actually-works), skills can appear on skills.sh through install telemetry. Direct installation works independently of directory indexing; do not promise immediate search visibility. The [CLI documentation](https://skills.sh/docs/cli) explains telemetry and its opt-out setting.
 
-The repository is also a Claude Code plugin marketplace. `.claude-plugin/marketplace.json` lists the root plugin, whose manifest is `.claude-plugin/plugin.json`; its standard `skills/` directory contains the same skill installed by the Skills CLI. No second implementation is maintained. Validate both manifests with `claude plugin validate PATH --strict`, and test installation with an isolated `CLAUDE_CONFIG_DIR` before publishing changes. Keep the plugin version and `metadata.version` in the skill aligned when releasing an update.
+The repository is also a Claude Code plugin marketplace. `.claude-plugin/marketplace.json` lists the root plugin, whose manifest is `.claude-plugin/plugin.json`; its standard `skills/` directory contains both skills. No second implementation is maintained. Validate both manifests with `claude plugin validate PATH --strict`, and test installation with an isolated `CLAUDE_CONFIG_DIR` before publishing changes. Keep the root package, plugin version, and both skills' `metadata.version` aligned when releasing an update.
 
 For ClawHub, publish only `skills/whiteboard/`, including its license. Use the pinned CLI and review the preview first:
 
@@ -37,10 +37,10 @@ For ClawHub, publish only `skills/whiteboard/`, including its license. Use the p
 npx --yes clawhub@0.23.3 login
 npx --yes clawhub@0.23.3 skill publish skills/whiteboard \
   --slug excalidraw-whiteboard --name "Excalidraw Whiteboard" \
-  --version 0.1.0 --changelog "Initial release" --dry-run
+  --version NEXT_VERSION --changelog "Describe the changes in this release" --dry-run
 ```
 
-After reviewing, remove `--dry-run` and include `--source-repo jimjeffers/excalidraw-whiteboard-skill --source-commit COMMIT_SHA --source-path skills/whiteboard` for the exact published source. Choose a new version for changed content. ClawHub requires an authenticated publisher and may hold a release for security checks; a preview or accepted upload is not proof that a public listing is available. Its runtime metadata declares local tools and optional storage overrides; no API key is required by the whiteboard itself.
+Replace `NEXT_VERSION` with the version being published. After reviewing, remove `--dry-run` and include `--source-repo jimjeffers/excalidraw-whiteboard-skill --source-commit COMMIT_SHA --source-path skills/whiteboard` for the exact published source. Choose a new version for changed content. ClawHub requires an authenticated publisher and may hold a release for security checks; a preview or accepted upload is not proof that a public listing is available. Its runtime metadata declares local tools and optional storage overrides; no API key is required by the whiteboard itself. A Git push does not update ClawHub. The separate `whiteboard-share` skill is currently distributed through GitHub and the Claude Code plugin; it is not included in the existing ClawHub package.
 
 ## Layout checks
 
@@ -51,6 +51,29 @@ node skills/whiteboard/scripts/check-layout.mjs examples/session-architecture.ex
 ```
 
 The tests exercise duplicate labels, card overlaps, horizontal and vertical spacing, unsupported geometry, invalid input, and the read-only CLI's exit codes. Inspect the rendered images too: stored text bounds can be estimates before browser sync.
+
+## Sharing checks
+
+The separate `skills/whiteboard-share/` skill accepts a native export and uses Node built-ins for compression, encryption, upload, and retrieval checks. Install it with `npm run install:share` and/or `npm run install:share:claude`. Its installer uses the same profile backup mechanism as `whiteboard`.
+
+```sh
+npm run verify:share
+node skills/whiteboard-share/scripts/share.mjs inspect /absolute/path/board.excalidraw
+```
+
+Inspection makes no network requests. To deliberately upload the inspected revision, create an ignored receipt directory and substitute the returned SHA-256:
+
+```sh
+mkdir -p .local/shares
+node skills/whiteboard-share/scripts/share.mjs upload /absolute/path/board.excalidraw \
+  --sha256 HASH_FROM_INSPECT --receipt .local/shares/board-revision.json
+```
+
+The receipt contains the full share link, including its decryption key. Reusing it prevents a second POST; verification failures retry only the GET. Pending or uncertain outcomes require review before another upload. Do not commit private receipts or use private working boards for integration tests.
+
+The automated tests are offline. They independently decrypt the generated wire payload, check preservation of diagram elements and background, exercise hash and image rejection, and verify receipt reuse and network failure handling. A live smoke test should use an already public example, then open the returned link and inspect its rendering. On October 15, 2026, `examples/background-jobs.excalidraw` passed upload, ciphertext retrieval, and browser rendering checks.
+
+The helper follows the [official Excalidraw export implementation](https://github.com/excalidraw/excalidraw/blob/master/excalidraw-app/data/index.ts) and its [binary encoding](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/encode.ts). The public service can change independently of this repository. Images require a separate asset storage workflow and are rejected by the helper rather than omitted.
 
 ## Integration checks
 

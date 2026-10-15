@@ -33,7 +33,7 @@ The agent starts a named board and opens its returned URL, or supplies a link if
 
 ### Alternative: Claude Code plugin marketplace
 
-For Claude Code, you can install the same skill as a plugin:
+For Claude Code, you can install both `whiteboard` and the optional `whiteboard-share` companion as one plugin:
 
 ```sh
 claude plugin marketplace add jimjeffers/excalidraw-whiteboard-skill
@@ -41,6 +41,25 @@ claude plugin install excalidraw-whiteboard@jimjeffers-skills
 ```
 
 Start a new Claude Code session and invoke `/excalidraw-whiteboard:whiteboard`, or ask Claude to use the whiteboard skill. The first board request bootstraps the same local runtime described above. Choose this or the Skills CLI for Claude Code to avoid duplicate copies; Codex can continue using the Skills CLI.
+
+## Optional: share a snapshot online
+
+The companion [whiteboard-share skill](skills/whiteboard-share/SKILL.md) uploads a saved revision to Excalidraw.com only when you request it. Local drawing and file exports remain local. Install it directly from GitHub:
+
+```sh
+npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill \
+  --skill whiteboard-share --global --agent codex claude-code
+```
+
+The Claude Code plugin already includes this companion; invoke `/excalidraw-whiteboard:whiteboard-share`. For an existing plugin installation, refresh the marketplace with `claude plugin marketplace update jimjeffers-skills`, then run `claude plugin update excalidraw-whiteboard@jimjeffers-skills` and start a new session. From a development checkout, use `npm run install:share` for Codex or `npm run install:share:claude` for Claude Code.
+
+Then ask:
+
+> Use whiteboard-share to upload this board to Excalidraw.com and give me a snapshot link.
+
+The agent exports the selected board, inspects that revision, and uses `share.mjs` to encrypt and upload it. The helper saves the link in a local receipt and verifies that the service returns the same encrypted payload. No Excalidraw account or MCP server is required. Anyone with the complete link can open the drawing.
+
+The link represents that revision: changes to the local board or a viewer's copy do not update the shared snapshot. Publish another revision for a new link. The helper handles diagrams without images, up to 5 MiB of JSON; boards with images use Excalidraw.com's browser import and sharing workflow. The local service stays on loopback throughout. See the [sharing commands and checks](docs/development.md#sharing-checks) for direct CLI use.
 
 ## What you can draw
 
@@ -157,6 +176,18 @@ skills/whiteboard/
 For a Skills CLI installation, rerun the install command above to update this skill from GitHub. The CLI fetches the current repository version; pinning the installer does not pin the skill to a commit.
 
 For a checkout installation, edit `skills/whiteboard/`, then rerun the appropriate `install:skill` command. That repository installer replaces the whole skill folder and backs up the old copy under the agent profile's `skill-backups/` directory. It respects `CODEX_HOME` for Codex and uses `~/.claude` for Claude Code. Board data is kept separately.
+
+The optional companion is self-contained:
+
+```text
+skills/whiteboard-share/
+├── SKILL.md                    # Explicit sharing workflow
+├── LICENSE
+├── agents/openai.yaml          # Codex display metadata
+└── scripts/share.mjs           # Inspect, encrypt, upload, verify
+```
+
+It accepts native exports and needs no runtime bootstrap. Update a Skills CLI installation by rerunning its install command. For a checkout installation, edit this folder and rerun `install:share` or `install:share:claude`. The local session helper has no upload command.
 
 Run installers and board operations sequentially. Rerun setup when a runtime update requires it; setup reuses an already installed version. For checks and the original prototype, see [development](docs/development.md).
 

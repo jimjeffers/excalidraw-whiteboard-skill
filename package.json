@@ -1,6 +1,6 @@
 {
   "name": "excalidraw-whiteboard-skill",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Local Excalidraw whiteboard sessions for Codex and Claude Code",
@@ -12,6 +12,8 @@
     "bootstrap": "node scripts/bootstrap.mjs",
     "install:skill": "node scripts/install-skill.mjs",
     "install:skill:claude": "node scripts/install-skill.mjs --claude",
+    "install:share": "node scripts/install-skill.mjs --skill whiteboard-share",
+    "install:share:claude": "node scripts/install-skill.mjs --claude --skill whiteboard-share",
     "start": "node scripts/whiteboard.mjs start",
     "stop": "node scripts/whiteboard.mjs stop",
     "status": "node scripts/whiteboard.mjs status",
@@ -19,6 +21,7 @@
     "seed": "node scripts/seed.mjs",
     "verify": "node scripts/verify.mjs",
     "verify:sessions": "node scripts/verify-sessions.mjs",
-    "verify:layout": "node --test scripts/verify-layout.test.mjs"
+    "verify:layout": "node --test scripts/verify-layout.test.mjs",
+    "verify:share": "node --test scripts/verify-share.test.mjs"
   }
 }
