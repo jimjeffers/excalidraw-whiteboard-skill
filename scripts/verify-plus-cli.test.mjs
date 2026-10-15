@@ -5,6 +5,7 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
+import { prepareFile } from '../skills/whiteboard-share/scripts/prepare-plus.mjs';
 
 const cliPackage = '@excalidraw/cli@0.2.0';
 const fakeKey = 'uk-local-test-not-a-real-key';
@@ -36,7 +37,19 @@ async function fixture(t, { failContent = false } = {}) {
       } else if (request.method === 'POST' && request.url === '/api/v1/scenes') {
         response.end(JSON.stringify({ metadata: { id: 'created-scene', name: body.name, collection: body.collectionId } }));
       } else if (request.method === 'PUT' && request.url === '/api/v1/scenes/created-scene/content') {
-        if (failContent) {
+        // The live Plus API rejects legacy arrows that the CLI passes through unchanged.
+        const invalidArrow = body.elements?.some(element => element.type === 'arrow' && (
+          !Number.isFinite(element.width) || !Number.isFinite(element.height)
+          || [element.startBinding, element.endBinding].some(binding => binding && (
+            !['inside', 'orbit', 'skip'].includes(binding.mode)
+            || !Array.isArray(binding.fixedPoint) || binding.fixedPoint.length !== 2
+            || !binding.fixedPoint.every(Number.isFinite)
+          ))
+        ));
+        if (invalidArrow) {
+          response.statusCode = 400;
+          response.end(JSON.stringify({ message: 'Arrow dimensions and current fixed-point bindings are required' }));
+        } else if (failContent) {
           response.statusCode = 503;
           response.end(JSON.stringify({ message: 'Simulated content failure' }));
         } else {
@@ -88,14 +101,17 @@ test('official CLI identifies the account and imports a native scene with embedd
   assert.equal(identity.code, 0, identity.stderr);
   assert.equal(JSON.parse(identity.stdout).workspace.id, 'test-workspace');
   assert(!identity.stdout.includes(fakeKey));
-  const created = await run('scenes', 'create', '--name', 'Import check', '--collection-id', 'private', '--file', file);
+  const prepared = join(dir, 'prepared.excalidraw');
+  await prepareFile(file, prepared);
+  const expected = JSON.parse(await readFile(prepared));
+  const created = await run('scenes', 'create', '--name', 'Import check', '--collection-id', 'private', '--file', prepared);
   assert.equal(created.code, 0, created.stderr);
   assert.equal(JSON.parse(created.stdout).metadata.id, 'created-scene');
   const output = join(dir, 'download.excalidraw');
   const downloaded = await run('scenes', 'content', 'get', 'created-scene', '--out', output);
   assert.equal(downloaded.code, 0, downloaded.stderr);
   const actual = JSON.parse(await readFile(output, 'utf8'));
-  assert.deepEqual(actual.elements, scene.elements);
+  assert.deepEqual(actual.elements, expected.elements);
   assert.deepEqual(actual.files, scene.files);
   assert.deepEqual(actual.appState, scene.appState);
   assert.equal(calls.filter(call => call.method === 'POST').length, 1);
@@ -113,8 +129,10 @@ test('official CLI rejects an invalid export before creating a remote scene', as
 });
 
 test('official CLI reports the created scene ID after a content failure without repeating creation', async t => {
-  const { file, calls, run } = await fixture(t, { failContent: true });
-  const result = await run('scenes', 'create', '--name', 'Partial import', '--collection-id', 'private', '--file', file);
+  const { dir, file, calls, run } = await fixture(t, { failContent: true });
+  const prepared = join(dir, 'prepared.excalidraw');
+  await prepareFile(file, prepared);
+  const result = await run('scenes', 'create', '--name', 'Partial import', '--collection-id', 'private', '--file', prepared);
   assert.notEqual(result.code, 0);
   assert.match(result.stderr, /Scene created-scene was created, but writing its content failed/);
   assert.deepEqual(calls.map(({ method }) => method), ['POST', 'PUT']);

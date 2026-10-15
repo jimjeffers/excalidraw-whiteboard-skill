@@ -4,7 +4,7 @@ description: "Upload a local Excalidraw whiteboard as an Excalidraw.com snapshot
 license: MIT
 metadata:
   author: Jim Jeffers
-  version: "0.3.0"
+  version: "0.3.1"
   compatibility: "Snapshot links require Node.js 20+ and network access, without an account. Plus imports use the pinned official CLI with Node.js 22+ and a Plus API key. Both accept a local .excalidraw export; no MCP server is required."
 ---
 

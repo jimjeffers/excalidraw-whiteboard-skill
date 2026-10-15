@@ -75,7 +75,7 @@ The CLI saves the key locally. Do not paste it into agent chat. Use a personal k
 
 > Use whiteboard-share to import this board into my private Excalidraw Plus collection as "API design".
 
-Or name an existing shared collection. The agent imports a new editable scene, including embedded images, and reads it back to verify the content. It preserves the returned scene ID if a content upload fails, so recovery can target that scene instead of creating duplicates. Access follows the selected collection and workspace settings; this does not enable public sharing or keep local and Plus edits synchronized. See the [Plus workflow](skills/whiteboard-share/references/plus.md) for verification and recovery.
+Or name an existing shared collection. The agent prepares a separate export for Plus, imports a new editable scene including embedded images, and reads it back to verify the content. Preparation upgrades the local runtime's simple legacy arrow bindings; unsupported legacy geometry requires re-exporting through a current editor. It preserves the returned scene ID if a content upload fails, so recovery can target that scene instead of creating duplicates. Access follows the selected collection and workspace settings; this does not enable public sharing or keep local and Plus edits synchronized. See the [Plus workflow](skills/whiteboard-share/references/plus.md) for verification and recovery.
 
 ## What you can draw
 
@@ -201,7 +201,9 @@ skills/whiteboard-share/
 ├── LICENSE
 ├── agents/openai.yaml          # Codex display metadata
 ├── references/plus.md          # Official CLI account import workflow
-└── scripts/share.mjs           # Account-free snapshot upload
+└── scripts/
+    ├── share.mjs               # Account-free snapshot upload
+    └── prepare-plus.mjs        # Offline export compatibility preparation
 ```
 
 It accepts native exports and needs no local server bootstrap. Plus imports download the pinned official CLI on first use and require account authentication. Update a Skills CLI installation by rerunning its install command. For a checkout installation, edit this folder and rerun `install:share` or `install:share:claude`. The local session helper has no upload command.

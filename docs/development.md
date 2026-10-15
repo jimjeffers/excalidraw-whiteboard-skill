@@ -83,9 +83,13 @@ Plus support is a workflow in `skills/whiteboard-share/references/plus.md` using
 npm run verify:plus
 ```
 
-This opt-in check downloads the pinned CLI if needed, then runs it against a disposable loopback API with a fake key. It checks account discovery, native import including image data, content read-back, rejection before creation, and preservation of the created scene ID when content upload fails. It makes no requests to a real Plus workspace and does not read or replace your saved login. These checks verify the CLI workflow, not the live Plus service.
+This opt-in check downloads the pinned CLI if needed, then runs it against a disposable loopback API with a fake key. It tests offline preparation of legacy arrow geometry, preservation of current bindings and images, refusal to guess unsupported legacy bindings, source-file protection, account discovery, prepared import/read-back, rejection before creation, and retention of the created scene ID when content upload fails. The mock enforces the arrow fields that the live API rejected during verification. It makes no requests to a real Plus workspace and does not read or replace your saved login. These checks verify the CLI workflow, not the complete live Plus schema.
+
+The live API requires current fixed-point arrow bindings and explicit dimensions; CLI validation alone does not catch missing element fields. `prepare-plus.mjs` handles the local runtime's centered, unrotated straight arrows without changing their coordinates. It deliberately rejects ambiguous legacy migrations. Plus can also regenerate IDs while preserving the drawing, so verify the remapped relationships rather than requiring identical IDs.
 
 For a live check, authenticate through the CLI, choose the intended workspace and collection, and import an already public example as a new scene. Read it back and inspect it in the Plus UI. Keep attempt records and downloaded scenes under ignored `.local/` paths. Do not claim live verification when credentials are unavailable. The API remains in public beta; recheck the commands and these tests before changing the pinned CLI version.
+
+On October 15, 2026, the prepared `examples/background-jobs.excalidraw` was imported into two selected Plus collections. Read-back preserved all 18 elements, geometry, labels, and relationships after reconciling regenerated IDs. Both downloaded scenes rendered successfully through the official CLI. The browser was not signed in to Plus, so this verified API storage and rendered downloads, not the Plus editor UI. This live example contains no images.
 
 ## Integration checks
 

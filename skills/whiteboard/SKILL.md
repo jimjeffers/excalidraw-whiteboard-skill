@@ -4,7 +4,7 @@ description: "Start, reopen, read, and edit local Excalidraw whiteboards with th
 license: MIT
 metadata:
   author: Jim Jeffers
-  version: "0.3.0"
+  version: "0.3.1"
   compatibility: "Requires a local shell, Node.js 20+, npm, Git, and a browser on the same computer. Setup downloads and builds a pinned runtime; sessions write local state and launch loopback servers."
   openclaw:
     homepage: https://github.com/jimjeffers/excalidraw-whiteboard-skill
