@@ -16,13 +16,19 @@ For `add`, supply a JSON array in a file or on stdin with `add -`. The CLI conve
 
 ```json
 [
-  {"id":"api","type":"rectangle","x":100,"y":100,"width":220,"height":100,"text":"API","backgroundColor":"#dbeafe","fillStyle":"solid"},
-  {"id":"queue","type":"rectangle","x":500,"y":100,"width":220,"height":100,"text":"Job queue","backgroundColor":"#fef3c7","fillStyle":"solid"},
-  {"id":"submit","type":"arrow","x":0,"y":0,"startElementId":"api","endElementId":"queue","text":"enqueue"}
+  {"id":"api","type":"rectangle","x":100,"y":100,"width":220,"height":100,"text":"API","fontFamily":"virgil","backgroundColor":"#dbeafe","fillStyle":"solid"},
+  {"id":"queue","type":"rectangle","x":500,"y":100,"width":220,"height":100,"text":"Job queue","fontFamily":"virgil","backgroundColor":"#fef3c7","fillStyle":"solid"},
+  {"id":"submit","type":"arrow","x":0,"y":0,"startElementId":"api","endElementId":"queue","text":"enqueue","fontFamily":"virgil"}
 ]
 ```
 
 Plan enough space for labels and connections. When a section label is needed to orient the viewer, use independent text; a label on a large background rectangle will appear at its center. Use `get`/`query` to obtain existing IDs instead of guessing. After browser sync, a shape's visible label can be a separate text element with `containerId`; update that text element when appropriate.
+
+## Fonts
+
+Set `fontFamily: "virgil"` (native scene value `1`) explicitly for handwritten text, including standalone annotations and section labels. Use `fontFamily: "cascadia"` (native value `3`) only when rendering an actual code snippet. Technical identifiers such as `ProductService`, `getOrder()`, or `/api/orders` are labels, not code snippets, and stay handwritten. Do not use `helvetica`/`2` for surrounding commentary by default.
+
+Check the generated text elements after sync, including native bound labels; if a label inherited another font, update that text element by ID. Reinspect text bounds, card fit, and connector clearance after font changes. Preserve user-authored styling unless asked to restyle it.
 
 ## Connector labels and spacing
 
