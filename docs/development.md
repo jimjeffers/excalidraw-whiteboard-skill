@@ -103,7 +103,7 @@ npm run verify
 
 `bootstrap` builds a pinned checkout under `upstream/mcp_excalidraw/` and generates a machine-local `.codex/config.toml` for the original prototype. It does not start a server. This development bootstrap is separate from `npm run setup`, which installs the reusable skill's runtime outside the repository.
 
-`verify:sessions` starts disposable boards to check distinct ports and scenes, explicit reopening, project scoping, unsafe-route rejection, concurrent reopen, persistence, snapshots, rendering, browser sync, local assets, and process ownership. `verify` exercises the original CLI and optional MCP adapter on a disposable canvas. Neither suite clears working boards. Evidence is written under ignored `output/` directories.
+`verify:access` unit-tests the session server's host, origin, and token checks. `verify:sessions` starts disposable boards to check access refusal, distinct ports and scenes, explicit reopening, project scoping, unsafe-route rejection, concurrent reopen, persistence, snapshots, rendering, browser sync, local assets, and process ownership. `verify` exercises the original CLI and optional MCP adapter on a disposable canvas. Neither suite clears working boards. Evidence is written under ignored `output/` directories.
 
 To check a separately installed runtime, set `WHITEBOARD_TEST_RUNTIME` to the `path` in its `runtime.json`. `WHITEBOARD_TEST_SCRIPT` can select an installed copy of `session.mjs`. The browser test still needs Playwright from the development checkout.
 

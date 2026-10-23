@@ -5,7 +5,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { home, revision } from './common.mjs';
 
-if (Number(process.versions.node.split('.')[0]) < 20) throw new Error('Use Node 20 or newer.');
+const [major, minor] = process.versions.node.split('.').map(Number);
+if (major < 20 || (major === 20 && minor < 6)) throw new Error('Use Node 20.6 or newer.');
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const target = join(home, 'runtimes', `${revision}-1`);
 const env = { ...process.env, PATH: `${dirname(process.execPath)}:${process.env.PATH || ''}` };

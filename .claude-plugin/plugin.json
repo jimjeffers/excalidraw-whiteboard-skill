@@ -1,6 +1,6 @@
 {
   "name": "excalidraw-whiteboard",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Draw, discuss, and refine local Excalidraw whiteboards with your coding agent; share snapshots or import into Plus when requested.",
   "author": {
     "name": "Jim Jeffers",

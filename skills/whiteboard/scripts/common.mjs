@@ -23,5 +23,6 @@ export function envFor(session, installed) {
     LOG_LEVEL: 'warn', LOG_FILE_PATH: join(home, 'sessions', session.id, 'canvas.log'),
     WHITEBOARD_RUNTIME: installed.path,
     WHITEBOARD_SESSION_ID: session.id, WHITEBOARD_INSTANCE_ID: session.instance,
+    WHITEBOARD_TOKEN: session.token || '',
   };
 }

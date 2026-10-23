@@ -4,7 +4,7 @@
 
 `start --name NAME --project DIRECTORY` creates a distinct board. `list` shows all saved boards; `list --project DIRECTORY` filters by the canonical directory path. Git worktrees therefore count as separate project directories. To deliberately share across worktrees, chats, or agent apps, pass the same session ID to `open`/`run`. Local Codex and Claude Code installations use the same runtime and session directory. No automatic chat-to-board binding exists.
 
-`open ID` returns the current URL. `run ID COMMAND...` also starts a stopped session when necessary. `stop ID` checks the server's session ID, launch instance, and PID before signaling it, and keeps all saved data. The helper uses a different available loopback port after restart; bookmarks may need the refreshed URL.
+`open ID` returns the current URL, including the access token for that launch. `run ID COMMAND...` also starts a stopped session when necessary. `stop ID` checks the server's session ID, launch instance, and PID before signaling it, and keeps all saved data. The helper uses a different available loopback port after restart; bookmarks may need the refreshed URL.
 
 ## Runtime setup
 
@@ -12,7 +12,7 @@ Run `node /absolute/path/to/this/skill/scripts/setup.mjs`. It fetches community 
 
 For development, `setup.mjs --source /absolute/path/to/prepared/upstream` can copy a built checkout at that commit with the expected lockfile patch. It installs runtime dependencies in the destination and does not retain a dependency on the source checkout. The installer never changes global Codex/MCP settings.
 
-Runtime code comes from [yctimlin/mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw), a community project embedding the official Excalidraw editor. This is an experimental local workflow. The original audit fixes are bundled; frontend dependency findings remain. The server has no authentication, and board edits are not conflict-safe. Do not expose it beyond loopback.
+Runtime code comes from [yctimlin/mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw), a community project embedding the official Excalidraw editor. This is an experimental local workflow. The original audit fixes are bundled; frontend dependency findings remain. Each launch gets a new random access token, stored only in that session's `session.json`. The server rejects requests whose `Host` is not its own loopback address, any cross-origin `Origin`, and any request or WebSocket upgrade without the token, so other web pages cannot read or change a board. The CLI sends the token as a header; the browser exchanges the URL token for an HttpOnly cookie. Board edits are not conflict-safe. Do not expose the server beyond loopback.
 
 ## Diagnosing a failed operation
 

@@ -21,7 +21,7 @@ For the default global installation above, you can also bootstrap ahead of time:
 node "$HOME/.agents/skills/whiteboard/scripts/setup.mjs"
 ```
 
-The Skills CLI stores a shared copy under `~/.agents/skills/whiteboard/` and links Claude Code to it. If you want to edit the skill itself, use the [checkout installation](docs/development.md#install-from-a-checkout), which supports Node 20+. Choose one installation method so you have one managed copy per agent.
+The Skills CLI stores a shared copy under `~/.agents/skills/whiteboard/` and links Claude Code to it. If you want to edit the skill itself, use the [checkout installation](docs/development.md#install-from-a-checkout), which supports Node 20.6+. Choose one installation method so you have one managed copy per agent.
 
 No Excalidraw account, API key, Docker, or MCP server is needed. The editor, service, and fonts run locally after setup. Your agent's normal access requirements still apply. This is a local desktop workflow; a cloud-only agent cannot access your computer's loopback address.
 
@@ -133,7 +133,7 @@ Your reply connects the sketch to a concrete requirement:
 
 `setup.mjs` fetches a pinned community runtime, applies the included dependency patch, builds the editor and server, and installs them under `~/.local/share/codex-whiteboard/`. The installed runtime is independent of this checkout and shared by the Codex and Claude Code skill copies. Dashed arrows in the diagram indicate that both servers use that build.
 
-For each `start`, `session.mjs` creates a UUID, selects an available loopback port, launches a detached Node process through `serve.mjs`, and assigns a separate data directory. The agent calls the service through the CLI and REST API; the browser syncs through WebSocket. `SKILL.md` supplies the workflow; the scripts handle setup, launch, routing, and persistence.
+For each `start`, `session.mjs` creates a UUID, selects an available loopback port, launches a detached Node process through `serve.mjs`, and assigns a separate data directory and a random access token. The agent calls the service through the CLI and REST API; the browser syncs through WebSocket. `SKILL.md` supplies the workflow; the scripts handle setup, launch, routing, and persistence.
 
 | Resource | Scope |
 | --- | --- |
@@ -212,7 +212,7 @@ Run installers and board operations sequentially. Rerun setup when a runtime upd
 
 ## Limits and credits
 
-This is an experimental local tool, tested on macOS; other platforms are unverified. The service is unauthenticated and must stay on loopback. It is not a remote multi-user service. The pinned frontend/build dependency tree still has audit findings. The layout checker detects common connector issues but does not replace visual review.
+This is an experimental local tool, tested on macOS; other platforms are unverified. Skill sessions require a per-launch access token and refuse other hosts and cross-origin requests; the original prototype server is unauthenticated. Keep both on loopback. It is not a remote multi-user service. The pinned frontend/build dependency tree still has audit findings. The layout checker detects common connector issues but does not replace visual review.
 
 The runtime is [yctimlin/mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw/tree/8084a1c8b410d625fcfd59d5cffb32f3a86a2a6f), a community toolkit embedding the official [Excalidraw editor](https://github.com/excalidraw/excalidraw). This skill is independent of both projects. MCP is available upstream but is not used by this skill's session workflow.
 

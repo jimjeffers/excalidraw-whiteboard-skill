@@ -2,6 +2,7 @@
 // duplicate process launches, and signaling a process owned by another board.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import { request } from 'node:http';
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -75,6 +76,18 @@ try {
   assert.equal(readFileSync(join(project, 'preview.png')).subarray(1, 4).toString(), 'PNG');
   pass('Concurrent reopen starts one process; state, snapshots, exports, and rendering work');
 
+  const origin = new URL(opened[0].url).origin;
+  assert.equal((await fetch(`${origin}/api/elements`)).status, 401);
+  assert.equal((await fetch(`${origin}/api/elements/clear`, { method: 'DELETE', headers: { Origin: 'https://example.com' } })).status, 403);
+  // fetch() does not send a caller-supplied Host header, so use http.request for a rebound hostname.
+  const reboundStatus = await new Promise((resolve, reject) => {
+    request(`${origin}/api/elements`, { headers: { Host: `example.com:${new URL(origin).port}` } }, res => { res.resume(); resolve(res.statusCode); })
+      .on('error', reject).end();
+  });
+  assert.equal(reboundStatus, 421);
+  assert.match(await invoke(['run', a.id, 'get', 'only-in-a']), /Session A only/);
+  pass('Requests without the token, from other origins, or for other hosts are refused');
+
   // Exercise the copied runtime's static assets and browser sync through the
   // session helper. Missing frontend dependencies must not hide behind /health.
   const { chromium } = await import(pathToFileURL(join(upstream, 'node_modules/playwright/index.mjs')));
@@ -83,7 +96,7 @@ try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     const external = new Set();
     await page.route('**/*', route => {
-      if (new URL(route.request().url()).origin === opened[0].url) return route.continue();
+      if (new URL(route.request().url()).origin === new URL(opened[0].url).origin) return route.continue();
       external.add(route.request().url());
       return route.abort();
     });
@@ -117,7 +130,8 @@ try {
   try {
     await invoke(['run', a.id, 'clear', '--yes'], { fail: true });
     await invoke(['stop', a.id], { fail: true });
-    assert.equal((await fetch(`${b.url}/health`).then(r => r.json())).pid, b.pid);
+    const bToken = JSON.parse(readFileSync(join(home, 'sessions', b.id, 'session.json'), 'utf8')).token;
+    assert.equal((await fetch(`${new URL(b.url).origin}/health`, { headers: { 'x-whiteboard-token': bToken } }).then(r => r.json())).pid, b.pid);
     pass('Mismatched session identity blocks both mutations and process termination');
   } finally { writeFileSync(metadataPath, original); }
 
