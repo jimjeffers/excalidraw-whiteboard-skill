@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { closeSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { tokenHeader, tokenParam } from './access.mjs';
 import { home, runtime, envFor } from './common.mjs';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -20,7 +21,8 @@ const usage = `Whiteboard sessions (local only)
 Commands: add, apply, get, query, update, delete, describe, screenshot,
           render, export, import, mermaid, snapshot, arrange, clear
 All commands require an explicit session ID except start/list/help.
-The URL can change after restart; use open to get the current address.`;
+The URL can change after restart; use open to get the current address.
+The URL carries this board's access token; share it only with the user.`;
 
 function directory(id) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id || '')) {
@@ -48,7 +50,9 @@ async function inspect(session) {
   if (!session.pid || !session.port) return 'stopped';
   let identity;
   try {
-    const response = await fetch(`http://127.0.0.1:${session.port}/__whiteboard/session`, { signal: AbortSignal.timeout(700) });
+    const response = await fetch(`http://127.0.0.1:${session.port}/__whiteboard/session`, {
+      headers: session.token ? { [tokenHeader]: session.token } : {}, signal: AbortSignal.timeout(700),
+    });
     if (response.ok) identity = await response.json();
   } catch { /* A stopped server has no HTTP endpoint. */ }
   if (identity) {
@@ -57,10 +61,15 @@ async function inspect(session) {
   }
   return alive(session.pid) ? 'unreachable' : 'stopped';
 }
+function boardUrl(session) {
+  const url = new URL(`http://127.0.0.1:${session.port}/`);
+  if (session.token) url.searchParams.set(tokenParam, session.token);
+  return url.href;
+}
 function publicSession(session, status) {
   return {
     id: session.id, name: session.name, project: session.project, status,
-    url: status === 'running' ? `http://127.0.0.1:${session.port}` : null,
+    url: status === 'running' ? boardUrl(session) : null,
     pid: session.pid, dataDirectory: join(directory(session.id), 'data'),
   };
 }
@@ -93,6 +102,7 @@ async function ensure(session) {
   const installed = runtime();
   session.port = await availablePort();
   session.instance = randomUUID();
+  session.token = randomBytes(32).toString('base64url');
   const log = openSync(join(directory(session.id), 'process.log'), 'a', 0o600);
   let child;
   try {
@@ -124,7 +134,7 @@ async function stop(session) {
   } else if (state !== 'stopped') {
     throw new Error(`Session identity cannot be verified (${state}); refusing to signal this process.`);
   }
-  session.pid = null; session.port = null; session.instance = null;
+  session.pid = null; session.port = null; session.instance = null; session.token = null;
   save(session);
   return publicSession(session, 'stopped');
 }
@@ -145,7 +155,7 @@ async function runCli(session, args) {
   }
   await ensure(session);
   const installed = runtime();
-  const child = spawn(installed.node, [join(installed.path, 'dist/bin.js'), ...args], {
+  const child = spawn(installed.node, ['--import', pathToFileURL(join(scriptDir, 'client-auth.mjs')).href, join(installed.path, 'dist/bin.js'), ...args], {
     cwd: session.project, env: envFor(session, installed), stdio: 'inherit',
   });
   const code = await new Promise((resolve, reject) => { child.once('error', reject); child.once('exit', code => resolve(code)); });
@@ -154,12 +164,13 @@ async function runCli(session, args) {
 async function main() {
   const [command = 'help', ...args] = process.argv.slice(2);
   if (command === 'help' || command === '--help') { console.log(usage); return; }
-  if (Number(process.versions.node.split('.')[0]) < 20) throw new Error('Use Node 20 or newer (tested with Node 24).');
+  const [major, minor] = process.versions.node.split('.').map(Number);
+  if (major < 20 || (major === 20 && minor < 6)) throw new Error('Use Node 20.6 or newer (tested with Node 24).');
   mkdirSync(sessionsDir, { recursive: true, mode: 0o700 });
   if (command === 'start') {
     const opts = options(args, ['--name', '--project']);
     if (!opts.name?.trim()) throw new Error('Provide a short board name with --name.');
-    const session = { schema: 1, id: randomUUID(), name: opts.name.trim(), project: realpathSync(resolve(opts.project || process.cwd())), createdAt: new Date().toISOString(), port: null, pid: null, instance: null };
+    const session = { schema: 1, id: randomUUID(), name: opts.name.trim(), project: realpathSync(resolve(opts.project || process.cwd())), createdAt: new Date().toISOString(), port: null, pid: null, instance: null, token: null };
     mkdirSync(directory(session.id), { mode: 0o700 });
     save(session);
     return locked(session.id, async s => publicSession(await ensure(s), 'running'));

@@ -4,7 +4,7 @@ description: "Start, reopen, read, and edit local Excalidraw whiteboards with th
 license: MIT
 metadata:
   author: Jim Jeffers
-  version: "0.3.1"
+  version: "0.3.2"
   compatibility: "Requires a local shell, Node.js 20+, npm, Git, and a browser on the same computer. Setup downloads and builds a pinned runtime; sessions write local state and launch loopback servers."
   openclaw:
     homepage: https://github.com/jimjeffers/excalidraw-whiteboard-skill
@@ -25,7 +25,7 @@ Give the user an editable Excalidraw canvas and work on that same scene through 
 
 ## Choose the board
 
-Resolve `scripts/session.mjs` relative to this `SKILL.md`. Use its absolute path so commands work from any project. Examples below use `SESSION_CLI` for that path; use Node 20 or newer.
+Resolve `scripts/session.mjs` relative to this `SKILL.md`. Use its absolute path so commands work from any project. Examples below use `SESSION_CLI` for that path; use Node 20.6 or newer.
 
 ```sh
 node "$SESSION_CLI" list --project /absolute/project/path
@@ -35,9 +35,9 @@ node "$SESSION_CLI" open SESSION_ID
 
 `start` always creates a new board, even when the name matches an existing one. For a new whiteboard request, use a short topic name and the current project/workspace directory. For an existing board, use its previously returned ID or list sessions to identify it. If several candidates fit and context does not settle the choice, ask which board to use. Never choose a board solely because its port is listening.
 
-Keep the selected session ID explicit in subsequent commands. Separate chats get separate boards unless the user wants to reopen/share an existing session. `open` starts or reuses that exact board and returns its current URL; the port can change after restart. Open that URL in the current app's browser or an available local browser, and leave it available to the user. If opening is unavailable, give the clickable URL. `open` itself does not launch a browser.
+Keep the selected session ID explicit in subsequent commands. Separate chats get separate boards unless the user wants to reopen/share an existing session. `open` starts or reuses that exact board and returns its current URL; the port can change after restart. Open that URL in the current app's browser or an available local browser, and leave it available to the user. If opening is unavailable, give the clickable URL. `open` itself does not launch a browser. The URL carries the board's access token: give it only to the user, and keep it out of files, commits, and shared logs. The browser exchanges it for a cookie on first load.
 
-The runtime installs separately under `~/.local/share/codex-whiteboard/`. If it is missing, run this skill's `scripts/setup.mjs`; it builds the pinned source and requires network access, Git, npm, and Node 20+. See [operations](references/operations.md) for setup or lifecycle failures. Avoid unpinned `npx` commands and the original prototype's fixed-port wrapper.
+The runtime installs separately under `~/.local/share/codex-whiteboard/`. If it is missing, run this skill's `scripts/setup.mjs`; it builds the pinned source and requires network access, Git, npm, and Node 20.6+. See [operations](references/operations.md) for setup or lifecycle failures. Avoid unpinned `npx` commands and the original prototype's fixed-port wrapper.
 
 ## Read and discuss
 

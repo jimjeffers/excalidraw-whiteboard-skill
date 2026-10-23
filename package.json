@@ -1,6 +1,6 @@
 {
   "name": "excalidraw-whiteboard-skill",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "type": "module",
   "description": "Local Excalidraw whiteboard sessions for Codex and Claude Code",
@@ -22,6 +22,7 @@
     "verify": "node scripts/verify.mjs",
     "verify:sessions": "node scripts/verify-sessions.mjs",
     "verify:layout": "node --test scripts/verify-layout.test.mjs",
+    "verify:access": "node --test scripts/verify-access.test.mjs",
     "verify:share": "node --test scripts/verify-share.test.mjs",
     "verify:plus": "node --test scripts/verify-plus-prepare.test.mjs scripts/verify-plus-cli.test.mjs"
   }
