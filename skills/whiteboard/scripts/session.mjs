@@ -63,7 +63,8 @@ async function inspect(session) {
 }
 function boardUrl(session) {
   const url = new URL(`http://127.0.0.1:${session.port}/`);
-  if (session.token) url.searchParams.set(tokenParam, session.token);
+  // A fragment is never sent to a server or in a Referer; the page moves it to sessionStorage.
+  if (session.token) url.hash = new URLSearchParams({ [tokenParam]: session.token }).toString();
   return url.href;
 }
 function publicSession(session, status) {
