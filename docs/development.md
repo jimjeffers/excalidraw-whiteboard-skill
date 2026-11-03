@@ -1,6 +1,6 @@
 # Development
 
-The local workflow lives in `skills/whiteboard/`; explicit online sharing lives in `skills/whiteboard-share/`. Edit these source folders, then install them into the desired agent profiles. The scripts use Node built-ins; the repository itself needs no `npm install`.
+The local canvas workflow lives in `skills/whiteboard/`; explicit online sharing lives in `skills/whiteboard-share/`; quick in-chat ASCII sketches live in `skills/ascii-riff/`. Edit these source folders, then install them into the desired agent profiles. The scripts use Node built-ins; the repository itself needs no `npm install`.
 
 ## Install from a checkout
 
@@ -14,14 +14,19 @@ cd excalidraw-whiteboard-skill
 npm run install:skill          # Codex: ~/.codex/skills/whiteboard
 npm run install:skill:claude   # Claude Code: ~/.claude/skills/whiteboard
 
+npm run install:ascii         # Codex: ~/.codex/skills/ascii-riff
+npm run install:ascii:claude  # Claude Code: ~/.claude/skills/ascii-riff
+
 npm run setup
 ```
 
 These copies have different ownership and update behavior from a Skills CLI installation. Use the repository installers for local development copies and the Skills CLI for copies managed by that CLI. Avoid installing the same skill through both methods for the same agent.
 
+For ASCII-only use, run the `install:ascii` command for your agent and skip `npm run setup`; the ASCII skill has no runtime dependency.
+
 ## Distribution and discovery
 
-The public repository is directly installable with the Skills CLI. Each `skills/*/SKILL.md` supplies a skill's name and description; supporting scripts and references travel with that skill folder. Listing the repository should discover both `whiteboard` and `whiteboard-share`:
+The public repository is directly installable with the Skills CLI. Each `skills/*/SKILL.md` supplies a skill's name and description; supporting scripts and references travel with that skill folder. Listing the repository should discover `whiteboard`, `whiteboard-share`, and `ascii-riff`:
 
 ```sh
 npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill --list
@@ -29,7 +34,7 @@ npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill --list
 
 There is no separate npm package or skills.sh registry submission to publish. According to [Vercel's publishing guide](https://vercel.com/kb/guide/agent-skills-creating-installing-and-sharing-reusable-agent-context#5-publishing-and-discoverability-how-listing-actually-works), skills can appear on skills.sh through install telemetry. Direct installation works independently of directory indexing; do not promise immediate search visibility. The [CLI documentation](https://skills.sh/docs/cli) explains telemetry and its opt-out setting.
 
-The repository is also a Claude Code plugin marketplace. `.claude-plugin/marketplace.json` lists the root plugin, whose manifest is `.claude-plugin/plugin.json`; its standard `skills/` directory contains both skills. No second implementation is maintained. Validate both manifests with `claude plugin validate PATH --strict`, and test installation with an isolated `CLAUDE_CONFIG_DIR` before publishing changes. Keep the root package, plugin version, and both skills' `metadata.version` aligned when releasing an update.
+The repository is also a Claude Code plugin marketplace. `.claude-plugin/marketplace.json` lists the root plugin, whose manifest is `.claude-plugin/plugin.json`; its standard `skills/` directory contains all three skills. No second implementation is maintained. Validate both manifests with `claude plugin validate PATH --strict`, and test installation with an isolated `CLAUDE_CONFIG_DIR` before publishing changes. Keep the root package, plugin version, and versioned skills' `metadata.version` aligned when releasing an update.
 
 For ClawHub, publish only `skills/whiteboard/`, including its license. Use the pinned CLI and review the preview first:
 

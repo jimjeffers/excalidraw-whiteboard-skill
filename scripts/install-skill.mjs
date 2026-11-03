@@ -11,9 +11,9 @@ while (args.length) {
   const arg = args.shift();
   if (arg === '--claude' && !claude) claude = true;
   else if (arg === '--skill' && args.length) skill = args.shift();
-  else throw new Error('Usage: node scripts/install-skill.mjs [--claude] [--skill whiteboard|whiteboard-share]');
+  else throw new Error('Usage: node scripts/install-skill.mjs [--claude] [--skill whiteboard|whiteboard-share|ascii-riff]');
 }
-if (!['whiteboard', 'whiteboard-share'].includes(skill)) throw new Error('Unknown skill.');
+if (!['whiteboard', 'whiteboard-share', 'ascii-riff'].includes(skill)) throw new Error('Unknown skill.');
 const source = join(project, 'skills', skill);
 const profileDir = claude
   ? join(homedir(), '.claude')

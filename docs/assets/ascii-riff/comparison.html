@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>ASCII riff and whiteboard — measured outputs</title>
+<style>
+* { box-sizing: border-box; }
+body { margin:0; background:#f3f2ed; color:#202824; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+main { max-width:1840px; margin:0 auto; padding:42px 48px 30px; }
+.eyebrow { margin:0 0 10px; color:#57645d; font-size:13px; font-weight:650; letter-spacing:1.6px; text-transform:uppercase; }
+h1 { margin:0; font-size:40px; font-weight:650; letter-spacing:-1.3px; }
+.subtitle { margin:12px 0 28px; font-size:17px; color:#526059; }
+.comparison { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; }
+article { background:#fff; border:1px solid #d3dbd5; border-top:4px solid #28736a; border-radius:12px; overflow:hidden; min-width:0; }
+article.whiteboard { border-top-color:#b86a36; }
+.card-top { padding:26px 28px 0; }
+h2 { font-size:26px; line-height:1.25; margin:0 0 6px; letter-spacing:-.5px; }
+.kind { color:#617068; font-size:15px; margin:0 0 22px; }
+.metrics { display:flex; gap:52px; }
+.metrics strong { font-size:34px; line-height:1.15; font-weight:650; font-variant-numeric:tabular-nums; }
+.metrics strong span { font-size:20px; font-weight:450; }
+.metrics small { display:block; color:#58675e; font-size:13px; margin-top:6px; }
+.detail { font-size:12px; color:#65746c; margin:16px 0 0; padding-bottom:20px; border-bottom:1px solid #e5e9e6; }
+.visual { height:390px; padding:22px; display:flex; align-items:center; justify-content:center; overflow:auto; }
+pre { font:14px/1.65 Menlo,Consolas,"Liberation Mono",monospace; white-space:pre; margin:0; flex-shrink:0; }
+.visual img { display:block; width:100%; height:100%; max-height:100%; aspect-ratio:1077/542; object-fit:contain; }
+.notes { margin:0 28px; border-top:1px solid #e5e9e6; padding:18px 0 24px; min-height:163px; }
+.notes p { font-size:14px; line-height:1.65; margin:0; }
+.notes .assumption { color:#627068; font-size:12px; margin-bottom:9px; }
+footer { padding-top:20px; color:#57645d; font-size:12px; line-height:1.7; }
+footer p { margin:0; }
+@media (max-width:1200px) { .comparison { grid-template-columns:minmax(0,1fr); } main { max-width:900px; padding:28px 20px; } }
+@media (max-width:650px) { h1 { font-size:30px; } .card-top { padding:20px 18px 0; } .metrics { gap:24px; } .metrics strong { font-size:27px; } .visual { justify-content:flex-start; height:auto; min-height:260px; } .notes { margin:0 18px; } }
+</style></head><body><main>
+<header><p class="eyebrow">Visual skill comparison / November 2, 2026</p><h1>Same design request. Two ways to riff.</h1><p class="subtitle">Upload processing with retries · Same model settings · One measured run per skill</p></header>
+<div class="comparison">
+<article id="ascii-output"><div class="card-top"><h2>ASCII riff</h2><p class="kind">A compact sketch directly in chat</p><div class="metrics"><div><strong>13.7<span> sec</span></strong><small>Time to completion</small></div><div><strong>43,321</strong><small>Input + output tokens</small></div></div><p class="detail">42,950 input (34,304 cached) &nbsp; + &nbsp; 371 output</p></div><div class="visual"><pre>[Browser] --upload--&gt; [Upload API] --1. store file--&gt; [Object Storage]
+                          |                             |     ^
+                     2. enqueue                         |     |
+                     job + file key              read file   write result
+                          |                             |     |
+                          v                             v     |
+                     [Job Queue] --deliver job------&gt; [Worker]
+                          ^                             |
+                          +-- transient failure: -------+
+                              retry with backoff
+                              (limited attempts)</pre></div><div class="notes"><p class="assumption">Proposed flow; assume asynchronous processing with at-least-once delivery.</p><p><strong>Tradeoff:</strong> At-least-once delivery makes retries reliable but can process a job twice. Use a stable job ID and idempotent result writes so retries cannot create duplicate results.</p></div></article>
+<article id="whiteboard-output" class="whiteboard"><div class="card-top"><h2>Whiteboard</h2><p class="kind">An editable Excalidraw canvas</p><div class="metrics"><div><strong>68.7<span> sec</span></strong><small>Time to completion</small></div><div><strong>338,587</strong><small>Input + output tokens</small></div></div><p class="detail">334,970 input (306,048 cached) &nbsp; + &nbsp; 3,617 output</p></div><div class="visual"><img src="whiteboard-canvas.png" width="1077" height="542" alt="Upload processing architecture: Browser uploads to Upload API, which stores a file and queues its key. Worker reads the file and writes the result to Object Storage; transient failures retry after backoff."></div><div class="notes"><p class="assumption">Original exported canvas; the session remains editable.</p><p><strong>Key tradeoff:</strong> retries improve reliability but can repeat processing. Use a stable job ID and idempotent result writes; acknowledge the job only after saving its result.</p></div></article>
+</div><footer><p><strong>Capture provenance:</strong> Saved ASCII response and original whiteboard export, rendered in this documentation view; not screenshots of the original chat UI.</p><p>Tokens include cached input and tool interactions. Whiteboard includes session creation, export checks and a layout fix; browser opening was unavailable. One paired trial, not an average.</p><p>gpt-6-astra · high reasoning · priority tier · Skill creation and these documentation screenshots are excluded from the measurements.</p></footer>
+</main></body></html>

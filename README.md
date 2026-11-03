@@ -2,6 +2,37 @@
 
 Draw, discuss, and refine the same local Excalidraw board with Codex or Claude Code. The agent uses diagrams to explain a design; you use edits and sketches to communicate constraints, questions, and alternative approaches back to the agent.
 
+Choose the skill that fits the conversation:
+
+| Skill | Use it for | Output |
+| --- | --- | --- |
+| [ascii-riff](skills/ascii-riff/SKILL.md) | Quick visual brainstorming and revisions in chat | Plain ASCII diagrams |
+| [whiteboard](skills/whiteboard/SKILL.md) | A shared canvas you and the agent can edit | Local Excalidraw board, PNG, and editable export |
+| [whiteboard-share](skills/whiteboard-share/SKILL.md) | Explicitly requested online sharing | Excalidraw.com snapshot or Excalidraw Plus import |
+
+## Quick visual riffs with ASCII
+
+`ascii-riff` makes a small sketch directly in chat, calls out the key tradeoff, and revises the sketch as you explore the idea. It needs no Excalidraw runtime, browser, or canvas setup.
+
+Install it for Codex and Claude Code with the pinned Skills CLI (Node.js 22.20+):
+
+```sh
+npx skills@1.7.2 add jimjeffers/excalidraw-whiteboard-skill \
+  --skill ascii-riff --global --agent codex claude-code
+```
+
+From a checkout, use `npm run install:ascii` for Codex or `npm run install:ascii:claude` for Claude Code. These checkout installers need Node.js but do not require the whiteboard setup step.
+
+Then ask:
+
+> Use ascii-riff to sketch an upload-processing system with a queue, worker, and retry path. Keep it small so we can riff on the design.
+
+Follow up with a change such as “Show where validation belongs” or “Compare polling with notifications.” In Codex, you can invoke `$ascii-riff` directly.
+
+![ASCII riff and whiteboard outputs for the same upload-processing request, with measured completion times and token usage.](docs/assets/ascii-riff/comparison.png)
+
+In one paired trial, ASCII completed in **13.7 seconds** with **43,321 input + output tokens**; whiteboard completed in **68.7 seconds** with **338,587 tokens**. Counts include cached input. The whiteboard run also created a session, rendered and exported the board, and corrected its layout. These are observations from one request, not average performance claims. See the [full comparison, individual screenshots, and methodology](docs/visual-riff-benchmark.md).
+
 ## Install and bootstrap
 
 Use the Skills CLI to install directly from GitHub, without manually cloning this repository. Requires **Node.js 22.20+** for the pinned installer below, npm, Git, and a local browser. Node 24 is recommended and is the tested version on macOS.
@@ -33,14 +64,14 @@ The agent starts a named board and opens its returned URL, or supplies a link if
 
 ### Alternative: Claude Code plugin marketplace
 
-For Claude Code, you can install both `whiteboard` and the optional `whiteboard-share` companion as one plugin:
+For Claude Code, you can install all three skills as one plugin:
 
 ```sh
 claude plugin marketplace add jimjeffers/excalidraw-whiteboard-skill
 claude plugin install excalidraw-whiteboard@jimjeffers-skills
 ```
 
-Start a new Claude Code session and invoke `/excalidraw-whiteboard:whiteboard`, or ask Claude to use the whiteboard skill. The first board request bootstraps the same local runtime described above. Choose this or the Skills CLI for Claude Code to avoid duplicate copies; Codex can continue using the Skills CLI.
+Start a new Claude Code session and invoke `/excalidraw-whiteboard:ascii-riff` for an ASCII sketch or `/excalidraw-whiteboard:whiteboard` for a canvas. The first board request bootstraps the same local runtime described above. Choose this or the Skills CLI for Claude Code to avoid duplicate copies; Codex can continue using the Skills CLI.
 
 ## Optional: upload online
 
@@ -172,6 +203,18 @@ node "$SESSION_CLI" stop SESSION_ID
 From any directory, point `SESSION_CLI` at the installed skill's absolute path. Export paths resolve relative to the session's project. Exports are copies; editing an exported file does not update the live board. See [drawing commands](skills/whiteboard/references/drawing.md) and [session operations](skills/whiteboard/references/operations.md) for editing, imports, snapshots, and recovery.
 
 ## Skill structure and updates
+
+The ASCII skill is self-contained:
+
+```text
+skills/ascii-riff/
+├── SKILL.md                    # In-chat sketching and iteration guidance
+└── agents/openai.yaml          # Codex display metadata
+```
+
+Rerun its Skills CLI installation command to update from GitHub. For a checkout installation, edit `skills/ascii-riff/`, then run `install:ascii` and/or `install:ascii:claude`. The checkout installer backs up the previous copy outside the profile's skill discovery directory.
+
+The local whiteboard skill includes its runtime helpers:
 
 ```text
 skills/whiteboard/

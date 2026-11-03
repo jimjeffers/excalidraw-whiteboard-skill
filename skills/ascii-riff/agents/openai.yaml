@@ -1,0 +1,4 @@
+interface:
+  display_name: "ASCII Riff"
+  short_description: "Sketch and iterate on ideas with ASCII diagrams"
+  default_prompt: "Use $ascii-riff to sketch this idea so we can quickly explore it together."

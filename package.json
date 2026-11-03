@@ -14,6 +14,8 @@
     "install:skill:claude": "node scripts/install-skill.mjs --claude",
     "install:share": "node scripts/install-skill.mjs --skill whiteboard-share",
     "install:share:claude": "node scripts/install-skill.mjs --claude --skill whiteboard-share",
+    "install:ascii": "node scripts/install-skill.mjs --skill ascii-riff",
+    "install:ascii:claude": "node scripts/install-skill.mjs --claude --skill ascii-riff",
     "start": "node scripts/whiteboard.mjs start",
     "stop": "node scripts/whiteboard.mjs stop",
     "status": "node scripts/whiteboard.mjs status",
