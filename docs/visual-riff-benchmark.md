@@ -6,11 +6,11 @@ The new [ascii-riff skill](../skills/ascii-riff/SKILL.md) is installed locally f
 
 ## Visual comparison
 
-![Side-by-side outputs for the same upload-processing request: ASCII riff completed in 13.7 seconds with 43,321 input plus output tokens; whiteboard completed in 68.7 seconds with 338,587 tokens. Both show the upload, queue, worker, storage, and retry relationships.](assets/ascii-riff/comparison.png)
+![Side-by-side outputs for the same upload-processing request: ASCII riff completed in 13.7 seconds with 43,321 input plus output tokens; whiteboard completed in 68.7 seconds with 338,587 tokens. Both show the upload, queue, worker, storage, and retry relationships.](assets/ascii-riff/comparison-minimal.png)
 
 These screenshots capture a documentation view of the saved ASCII response and the original whiteboard export, not the original chat UI. The diagram content is unchanged; headings and measured results were added for comparison. Creating these screenshots is excluded from the benchmark timings.
 
-Open the individual captures for larger text: [ASCII output](assets/ascii-riff/ascii-output.png) · [Whiteboard output](assets/ascii-riff/whiteboard-output.png). The [HTML capture source](assets/ascii-riff/comparison.html) is self-contained apart from its adjacent whiteboard PNG; open it locally to inspect or recapture at a different size. The combined screenshot uses an 1840-pixel-wide viewport.
+Open the individual captures for larger text: [ASCII output](assets/ascii-riff/ascii-output-minimal.png) · [Whiteboard output](assets/ascii-riff/whiteboard-output-minimal.png). The [HTML capture source](assets/ascii-riff/comparison.html) is self-contained apart from its adjacent whiteboard PNG; open it locally to inspect or recapture at a different size. The combined screenshot uses an 1840-pixel-wide viewport.
 
 ## Measured results
 

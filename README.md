@@ -29,7 +29,7 @@ Then ask:
 
 Follow up with a change such as “Show where validation belongs” or “Compare polling with notifications.” In Codex, you can invoke `$ascii-riff` directly.
 
-![ASCII riff and whiteboard outputs for the same upload-processing request, with measured completion times and token usage.](docs/assets/ascii-riff/comparison.png)
+![ASCII riff and whiteboard outputs for the same upload-processing request, with measured completion times and token usage.](docs/assets/ascii-riff/comparison-minimal.png)
 
 In one paired trial, ASCII completed in **13.7 seconds** with **43,321 input + output tokens**; whiteboard completed in **68.7 seconds** with **338,587 tokens**. Counts include cached input. The whiteboard run also created a session, rendered and exported the board, and corrected its layout. These are observations from one request, not average performance claims. See the [full comparison, individual screenshots, and methodology](docs/visual-riff-benchmark.md).
 
